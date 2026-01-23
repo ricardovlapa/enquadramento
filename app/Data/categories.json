@@ -1,0 +1,119 @@
+{
+    "featured": {
+        "label": "Destaques",
+        "items": [
+            {
+                "slug": "presidenciais-2026",
+                "label": "Presidenciais 2026",
+                "subtitle": "A corrida presidencial, candidatos e propostas."
+            },
+            {
+                "slug": "guerra-na-ucrania",
+                "label": "Guerra na Ucrânia",
+                "subtitle": "Evolução política, social e humanitária."
+            },
+            {
+                "slug": "crise-na-venezuela",
+                "label": "Crise na Venezuela",
+                "subtitle": "Evolução política, social e humanitária."
+            }
+        ]
+    },
+    "sections": {
+        "label": "Secções",
+        "items": [
+            {
+                "slug": "politica",
+                "label": "Política",
+                "subtitle": "Decisões, poder e debate público."
+            },
+            {
+                "slug": "economia",
+                "label": "Economia",
+                "subtitle": "Indicadores, mercados e políticas económicas."
+            },
+            {
+                "slug": "saude",
+                "label": "Saúde",
+                "subtitle": "Políticas de saúde, ciência e bem-estar público."
+            },
+            {
+                "slug": "pais",
+                "label": "País",
+                "subtitle": "Sociedade, instituições e território."
+            },
+            {
+                "slug": "mundo",
+                "label": "Mundo",
+                "subtitle": "Atualidade internacional e geopolítica."
+            },
+            {
+                "slug": "desporto",
+                "label": "Desporto",
+                "subtitle": "Resultados, competições e bastidores.",
+                "sub-categories": [
+                    {
+                        "slug": "atletismo",
+                        "label": "Atletismo"
+                    },
+                    {
+                        "slug": "andebol",
+                        "label": "Andebol"
+                    },
+                    {
+                        "slug": "futebol",
+                        "label": "Futebol"
+                    },
+                    {
+                        "slug": "tenis",
+                        "label": "Ténis"
+                    },
+                    {
+                        "slug": "outras-modalidades",
+                        "label": "Outras Modalidades"
+                    }
+                ]
+            },
+            {
+                "slug": "cultura",
+                "label": "Cultura",
+                "subtitle": "Artes, património e criação contemporânea."
+            },
+            {
+                "slug": "tecnologia",
+                "label": "Tecnologia",
+                "subtitle": "Inovação, ciência e impacto digital."
+            }
+        ]
+    },
+    "opinion": {
+        "label": "Opinião",
+        "items": [
+            {
+                "slug": "opiniao-enquadramento",
+                "label": "Opinião Enquadramento"
+            },
+            {
+                "slug": "opiniao-outras-fontes",
+                "label": "Opinião outras fontes"
+            },
+            {
+                "slug": "cartoon",
+                "label": "Cartoon"
+            },
+            {
+                "slug": "podcasts",
+                "label": "Podcasts"
+            }
+        ]
+    },
+    "otherCategories": {
+        "label": "Outras Categorias",
+        "items": [
+            {
+                "slug": "comercio",
+                "label": "Comércio"
+            }
+        ]
+    }
+}
