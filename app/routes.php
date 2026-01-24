@@ -3,6 +3,7 @@
 use App\Controller\HomeController;
 use App\Controller\NewsController;
 use App\Controller\OpinionController;
+use App\Controller\EditorialPrivacyController;
 use App\Controller\NotFoundController;
 use App\Controller\ShareController;
 use App\Model\NewsRepository;
@@ -13,6 +14,10 @@ use App\Router;
 return function (Router $router, array $site, NewsRepository $news, OpinionRepository $opinions, ?RedirectRepository $redirects = null): void {
     $router->get('/', function () use ($site, $news, $opinions) {
         (new HomeController($site, $news, $opinions))->show();
+    });
+
+    $router->get('/nota-editorial-e-privacidade', function () use ($site) {
+        (new EditorialPrivacyController($site))->show();
     });
 
     $router->get('/opiniao-enquadramento', function () use ($site, $opinions) {
