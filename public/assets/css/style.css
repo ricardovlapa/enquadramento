@@ -974,9 +974,39 @@ h3 {
 .footer-main {
   padding: 64px 0 56px;
   display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: start;
+  text-align: left;
+}
+
+.footer-brand {
+  grid-column: span 4;
+  display: grid;
   gap: 16px;
-  justify-items: center;
-  text-align: center;
+  align-content: start;
+}
+
+.footer-links {
+  grid-column: span 1;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.footer-links a {
+  color: #b7bdc0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+}
+
+.footer-cta {
+  justify-self: start;
 }
 
 .footer-avatar {
@@ -1001,6 +1031,7 @@ h3 {
   display: inline-flex;
   gap: 14px;
   margin-top: 6px;
+  justify-self: start;
 }
 
 .footer-social a {
@@ -1432,5 +1463,14 @@ h3 {
   .opinion-author__avatar {
     width: 88px;
     height: 110px;
+  }
+
+  .footer-main {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-brand,
+  .footer-links {
+    grid-column: auto;
   }
 }
