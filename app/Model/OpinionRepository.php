@@ -6,17 +6,13 @@ use PDO;
 
 class OpinionRepository
 {
-    private string $articlesFile;
-    private string $authorsFile;
     private ?array $articlesCache = null;
     private ?array $authorsCache = null;
     private ?array $authorsIndex = null;
     private ?PDO $pdo;
 
-    public function __construct(string $articlesFile, string $authorsFile, ?PDO $pdo = null)
+    public function __construct(?PDO $pdo = null)
     {
-        $this->articlesFile = $articlesFile;
-        $this->authorsFile = $authorsFile;
         $this->pdo = $pdo;
     }
 
@@ -121,46 +117,28 @@ class OpinionRepository
 
     private function loadArticles(): array
     {
-        if ($this->pdo !== null) {
-            try {
-                $articles = $this->loadArticlesFromDb();
-                if ($articles !== []) {
-                    return $articles;
-                }
-            } catch (\Exception $e) {
-                // Fall back to JSON on DB read errors.
-            }
-        }
-
-        if ($this->articlesFile === '' || !file_exists($this->articlesFile)) {
+        if ($this->pdo === null) {
             return [];
         }
 
-        $raw = file_get_contents($this->articlesFile);
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
+        try {
+            return $this->loadArticlesFromDb();
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     private function loadAuthors(): array
     {
-        if ($this->pdo !== null) {
-            try {
-                $authors = $this->loadAuthorsFromDb();
-                if ($authors !== []) {
-                    return $authors;
-                }
-            } catch (\Exception $e) {
-                // Fall back to JSON on DB read errors.
-            }
-        }
-
-        if ($this->authorsFile === '' || !file_exists($this->authorsFile)) {
+        if ($this->pdo === null) {
             return [];
         }
 
-        $raw = file_get_contents($this->authorsFile);
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
+        try {
+            return $this->loadAuthorsFromDb();
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     private function loadArticlesFromDb(): array

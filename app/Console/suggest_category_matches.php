@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use App\Service\Database;
+
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/../dotenv.php';
 
@@ -11,9 +13,7 @@ load_env([
 
 $config = require __DIR__ . '/../config.php';
 
-$itemsFile = (string) ($config['newsData'] ?? '');
 $trainingFile = (string) ($config['newsCategoryTrainingData'] ?? '');
-$sourcesFile = (string) ($config['newsSourcesData'] ?? '');
 $fixedCategories = $config['newsCategories'] ?? [];
 
 $options = parse_args($argv ?? []);
@@ -30,9 +30,16 @@ if (!is_array($fixedCategories)) {
     $fixedCategories = [];
 }
 
-$items = load_json_file($itemsFile);
+try {
+    $pdo = Database::requireConnectionFromEnv();
+} catch (\RuntimeException $e) {
+    fwrite(STDERR, $e->getMessage() . "\n");
+    exit(1);
+}
+
+$items = load_items_from_db($pdo);
 $trainingIndex = load_training_index($trainingFile);
-$sourcesIndex = load_sources_index($sourcesFile);
+$sourcesIndex = load_sources_index_from_db($pdo);
 
 $rawCounts = [];
 $rawSources = [];
@@ -196,7 +203,7 @@ function parse_args(array $argv): array
     return $options;
 }
 
-function load_json_file(string $path): array
+function load_training_index(string $path): array
 {
     if ($path === '' || !is_file($path)) {
         return [];
@@ -208,12 +215,6 @@ function load_json_file(string $path): array
     }
 
     $data = json_decode($raw, true);
-    return is_array($data) ? $data : [];
-}
-
-function load_training_index(string $path): array
-{
-    $data = load_json_file($path);
     if (!is_array($data)) {
         return [];
     }
@@ -239,30 +240,55 @@ function load_training_index(string $path): array
     return $index;
 }
 
-function load_sources_index(string $path): array
+function load_items_from_db(PDO $pdo): array
 {
-    $data = load_json_file($path);
-    if (!is_array($data)) {
+    $stmt = $pdo->query(
+        'SELECT id, source_id, category, categories_json FROM news_items'
+    );
+    $rows = $stmt === false ? [] : $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!is_array($rows)) {
         return [];
     }
 
-    $sources = $data['sources'] ?? $data;
-    if (!is_array($sources)) {
+    $items = [];
+    foreach ($rows as $row) {
+        $categories = [];
+        if (!empty($row['categories_json'])) {
+            $decoded = json_decode((string) $row['categories_json'], true);
+            if (is_array($decoded)) {
+                $categories = $decoded;
+            }
+        }
+        $items[] = [
+            'id' => (string) ($row['id'] ?? ''),
+            'source_id' => (string) ($row['source_id'] ?? ''),
+            'category' => $row['category'] ?? null,
+            'categories' => $categories,
+        ];
+    }
+
+    return $items;
+}
+
+function load_sources_index_from_db(PDO $pdo): array
+{
+    $stmt = $pdo->query(
+        'SELECT id, name, url FROM news_sources'
+    );
+    $rows = $stmt === false ? [] : $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!is_array($rows)) {
         return [];
     }
 
     $index = [];
-    foreach ($sources as $source) {
-        if (!is_array($source)) {
-            continue;
-        }
-        $id = trim((string) ($source['id'] ?? ''));
+    foreach ($rows as $row) {
+        $id = trim((string) ($row['id'] ?? ''));
         if ($id === '') {
             continue;
         }
         $index[$id] = [
-            'name' => (string) ($source['name'] ?? $id),
-            'url' => (string) ($source['url'] ?? ''),
+            'name' => (string) ($row['name'] ?? $id),
+            'url' => (string) ($row['url'] ?? ''),
         ];
     }
 

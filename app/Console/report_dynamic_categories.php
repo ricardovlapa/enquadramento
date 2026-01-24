@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+use App\Model\NewsRepository;
+use App\Service\Database;
+
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/../dotenv.php';
 
@@ -9,12 +12,8 @@ load_env([
     dirname(__DIR__, 2) . '/.env.local',
 ]);
 
-use App\Model\NewsRepository;
-
 $config = require __DIR__ . '/../config.php';
 
-$itemsFile = (string) ($config['newsData'] ?? '');
-$sourcesFile = (string) ($config['newsSourcesData'] ?? '');
 $trainingFile = (string) ($config['newsCategoryTrainingData'] ?? '');
 $fixedCategories = $config['newsCategories'] ?? [];
 
@@ -40,7 +39,15 @@ foreach ($fixedCategories as $category) {
     }
 }
 
-$news = new NewsRepository($itemsFile, $sourcesFile, $fixedCategories, $trainingFile);
+$pdo = null;
+try {
+    $pdo = Database::requireConnectionFromEnv();
+} catch (\RuntimeException $e) {
+    fwrite(STDERR, $e->getMessage() . "\n");
+    exit(1);
+}
+
+$news = new NewsRepository($fixedCategories, $trainingFile, $pdo);
 $items = $news->all();
 
 $sinceTimestamp = 0;

@@ -35,17 +35,11 @@ $site = $config['site'];
 $pdo = Database::getConnectionFromEnv();
 
 $news = new NewsRepository(
-    $config['newsData'] ?? '',
-    $config['newsSourcesData'] ?? '',
     $config['newsCategories'] ?? [],
     $config['newsCategoryTrainingData'] ?? '',
     $pdo
 );
-$opinions = new OpinionRepository(
-    $config['articlesData'] ?? '',
-    $config['authorsData'] ?? '',
-    $pdo
-);
+$opinions = new OpinionRepository($pdo);
 
 $redirects = $pdo !== null ? new RedirectRepository($pdo) : null;
 

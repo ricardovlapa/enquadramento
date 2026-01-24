@@ -6,8 +6,6 @@ use PDO;
 
 class NewsRepository
 {
-    private string $itemsFile;
-    private string $sourcesFile;
     private string $categoryTrainingFile;
     private ?array $sourcesIndex = null;
     private array $fixedCategories;
@@ -16,15 +14,11 @@ class NewsRepository
     private ?PDO $pdo;
 
     public function __construct(
-        string $itemsFile,
-        string $sourcesFile,
         array $fixedCategories = [],
         string $categoryTrainingFile = '',
         ?PDO $pdo = null
     )
     {
-        $this->itemsFile = $itemsFile;
-        $this->sourcesFile = $sourcesFile;
         $this->fixedCategories = $fixedCategories;
         $this->categoryTrainingFile = $categoryTrainingFile;
         $this->pdo = $pdo;
@@ -169,24 +163,15 @@ class NewsRepository
 
     private function loadItems(): array
     {
-        if ($this->pdo !== null) {
-            try {
-                $items = $this->loadItemsFromDb();
-                if ($items !== []) {
-                    return $items;
-                }
-            } catch (\Exception $e) {
-                // Fall back to JSON on DB read errors.
-            }
-        }
-
-        if (!file_exists($this->itemsFile)) {
+        if ($this->pdo === null) {
             return [];
         }
 
-        $raw = file_get_contents($this->itemsFile);
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
+        try {
+            return $this->loadItemsFromDb();
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     private function loadItemsFromDb(): array
@@ -296,42 +281,16 @@ class NewsRepository
             return $this->sourcesIndex;
         }
 
-        if ($this->pdo !== null) {
-            try {
-                $index = $this->loadSourcesIndexFromDb();
-                if ($index !== []) {
-                    $this->sourcesIndex = $index;
-                    return $this->sourcesIndex;
-                }
-            } catch (\Exception $e) {
-                // Fall back to JSON on DB read errors.
-            }
-        }
-
-        if ($this->sourcesFile === '' || !file_exists($this->sourcesFile)) {
+        if ($this->pdo === null) {
             $this->sourcesIndex = [];
             return $this->sourcesIndex;
         }
 
-        $raw = file_get_contents($this->sourcesFile);
-        $data = json_decode($raw, true);
-        if (!is_array($data)) {
+        try {
+            $this->sourcesIndex = $this->loadSourcesIndexFromDb();
+        } catch (\Exception $e) {
             $this->sourcesIndex = [];
-            return $this->sourcesIndex;
         }
-
-        $sources = $data['sources'] ?? [];
-        $index = [];
-        if (is_array($sources)) {
-            foreach ($sources as $source) {
-                $id = (string) ($source['id'] ?? '');
-                if ($id !== '') {
-                    $index[$id] = $source;
-                }
-            }
-        }
-
-        $this->sourcesIndex = $index;
         return $this->sourcesIndex;
     }
 

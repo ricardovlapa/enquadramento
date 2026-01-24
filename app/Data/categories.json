@@ -16,6 +16,11 @@
                 "slug": "crise-na-venezuela",
                 "label": "Crise na Venezuela",
                 "subtitle": "Evolução política, social e humanitária."
+            },
+            {
+                "slug": "crise-na-gronelandia",
+                "label": "Crise na Gronelândia",
+                "subtitle": "Evolução política, social e humanitária."
             }
         ]
     },
@@ -107,13 +112,5 @@
             }
         ]
     },
-    "otherCategories": {
-        "label": "Outras Categorias",
-        "items": [
-            {
-                "slug": "comercio",
-                "label": "Comércio"
-            }
-        ]
-    }
+    "otherCategories": {}
 }
