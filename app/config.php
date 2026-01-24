@@ -180,7 +180,7 @@ return [
         'branding' => [
             'logo' => env_string('SITE_LOGO', '/assets/images/enquadramento_logo_nav.png'),
             'logoAlt' => env_string('SITE_LOGO_ALT', $siteTitle),
-            'footerAvatar' => env_string('SITE_FOOTER_AVATAR', '/assets/images/default_image_enquadramento_100x100.png'),
+            'footerAvatar' => env_string('SITE_FOOTER_AVATAR', '/assets/images/default_image_enquadramento_100x100_gold.png'),
             'footerAvatarAlt' => env_string('SITE_FOOTER_AVATAR_ALT', 'Enquadramento'),
         ],
         'author' => [

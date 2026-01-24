@@ -213,35 +213,48 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer-main">
-        <img class="footer-avatar" src="<?= image_src($site['branding']['footerAvatar'] ?? '') ?>" alt="<?= e($site['branding']['footerAvatarAlt'] ?? '') ?>">
-        <h2 class="footer-name"><?= e($site['title']) ?></h2>
-        <p class="footer-text"><?= e($site['ui']['footer']['text'] ?? '') ?></p>
-        <div class="footer-social">
-          <?php if (!empty($site['social']['facebook'])): ?>
-            <a href="<?= e($site['social']['facebook']) ?>" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v6h3v-6h3l1-3h-4v-2c0-.6.4-1 1-1z" />
-              </svg>
-            </a>
-          <?php endif; ?>
-          <?php if (!empty($site['social']['instagram'])): ?>
-            <a href="<?= e($site['social']['instagram']) ?>" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.6" />
-                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6" />
-                <circle cx="16.5" cy="7.5" r="1.2" fill="currentColor" />
-              </svg>
-            </a>
-          <?php endif; ?>
-          <?php if (!empty($site['social']['linkedin'])): ?>
-            <a href="<?= e($site['social']['linkedin']) ?>" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M6 9H3v12h3z" />
-                <path d="M4.5 3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
-                <path d="M14.5 9a4.5 4.5 0 0 0-3.5 1.7V9H8v12h3v-6.2a2.2 2.2 0 0 1 2.2-2.2c1.3 0 1.8.8 1.8 2.1V21h3v-7.1C18 10.8 16.6 9 14.5 9z" />
-              </svg>
-            </a>
-          <?php endif; ?>
+        <div class="footer-brand">
+          <img class="footer-avatar" src="<?= image_src($site['branding']['footerAvatar'] ?? '') ?>" alt="<?= e($site['branding']['footerAvatarAlt'] ?? '') ?>">
+          <h2 class="footer-name"><?= e($site['title']) ?></h2>
+          <p class="footer-text"><?= e($site['ui']['footer']['text'] ?? '') ?></p>
+          <div class="footer-social">
+            <?php if (!empty($site['social']['facebook'])): ?>
+              <a href="<?= e($site['social']['facebook']) ?>" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v6h3v-6h3l1-3h-4v-2c0-.6.4-1 1-1z" />
+                </svg>
+              </a>
+            <?php endif; ?>
+            <?php if (!empty($site['social']['instagram'])): ?>
+              <a href="<?= e($site['social']['instagram']) ?>" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <circle cx="16.5" cy="7.5" r="1.2" fill="currentColor" />
+                </svg>
+              </a>
+            <?php endif; ?>
+            <?php if (!empty($site['social']['linkedin'])): ?>
+              <a href="<?= e($site['social']['linkedin']) ?>" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 9H3v12h3z" />
+                  <path d="M4.5 3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+                  <path d="M14.5 9a4.5 4.5 0 0 0-3.5 1.7V9H8v12h3v-6.2a2.2 2.2 0 0 1 2.2-2.2c1.3 0 1.8.8 1.8 2.1V21h3v-7.1C18 10.8 16.6 9 14.5 9z" />
+                </svg>
+              </a>
+            <?php endif; ?>
+          </div>
+          <a class="button button--light footer-cta" href="/nota-editorial-e-privacidade">Nota editorial e privacidade</a>
+        </div>
+        <div class="footer-links">
+          <a href="/">Início</a>
+          <a href="/todas-as-noticias">Todas as notícias</a>
+          <a href="/opiniao-enquadramento">Opinião</a>
+        </div>
+        <div class="footer-links">
+          <a href="#">Contactos</a>
+          <a href="/nota-editorial-e-privacidade">Nota editorial</a>
+          <a href="/nota-editorial-e-privacidade">Privacidade</a>
         </div>
       </div>
     </div>
