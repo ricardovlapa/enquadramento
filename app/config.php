@@ -309,11 +309,7 @@ return [
             ],
         ],
     ],
-    'newsData' => __DIR__ . '/Data/items.json',
-    'newsSourcesData' => __DIR__ . '/Data/newsFeed.json',
     'newsCategoriesData' => $newsCategoriesFile,
     'newsCategoryTrainingData' => $newsCategoryTrainingFile,
-    'articlesData' => __DIR__ . '/Data/articles.json',
-    'authorsData' => __DIR__ . '/Data/authors.json',
     'newsCategories' => $newsCategories,
 ];

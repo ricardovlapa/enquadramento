@@ -7,12 +7,10 @@ use PDO;
 
 class NewsFeedFetcher
 {
-    private string $sourcesFile;
     private ?PDO $pdo;
 
-    public function __construct(string $sourcesFile, ?PDO $pdo = null)
+    public function __construct(?PDO $pdo = null)
     {
-        $this->sourcesFile = $sourcesFile;
         $this->pdo = $pdo;
     }
 
@@ -60,37 +58,11 @@ class NewsFeedFetcher
      */
     private function readSources(): array
     {
-        if ($this->pdo !== null) {
-            try {
-                $sources = $this->readSourcesFromDb();
-                if ($sources !== []) {
-                    return $sources;
-                }
-            } catch (\Exception $e) {
-                // Fall back to JSON if DB fetch fails.
-            }
+        if ($this->pdo === null) {
+            throw new \RuntimeException('Database connection is required to read sources.');
         }
 
-        if (!is_file($this->sourcesFile)) {
-            throw new \RuntimeException('Sources file not found: ' . $this->sourcesFile);
-        }
-
-        $raw = file_get_contents($this->sourcesFile);
-        if ($raw === false) {
-            throw new \RuntimeException('Failed to read sources file: ' . $this->sourcesFile);
-        }
-
-        $data = json_decode($raw, true);
-        if (!is_array($data)) {
-            throw new \RuntimeException('Invalid JSON in sources file: ' . $this->sourcesFile);
-        }
-
-        $sources = $data['sources'] ?? [];
-        if (!is_array($sources)) {
-            return [];
-        }
-
-        return $sources;
+        return $this->readSourcesFromDb();
     }
 
     /**
