@@ -1,6 +1,6 @@
 {
-  "name": "starter/mvc-blog",
-  "description": "Minimal MVC blog",
+  "name": "enquadramento/site",
+  "description": "PHP news aggregation and editorial site",
   "type": "project",
   "scripts": {
     "serve": "php -S localhost:8000 -t public",
