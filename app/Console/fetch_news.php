@@ -15,59 +15,10 @@ use App\Service\Database;
 $pdo = Database::requireConnectionFromEnv();
 $fetcher = new NewsFeedFetcher($pdo);
 $fetchedAt = gmdate('c');
+$cutoff = time() - (7 * 24 * 60 * 60);
 $items = $fetcher->fetch();
 
-$existingItems = [];
-$stmt = $pdo->query('SELECT id, source_id, title, link, summary, published_at, author, category, categories_json, image_url, raw_guid, raw_extra_json, fetched_at FROM news_items');
-if ($stmt !== false) {
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if (is_array($rows)) {
-        foreach ($rows as $row) {
-            $categories = [];
-            $rawExtra = [];
-            if (!empty($row['categories_json'])) {
-                $decoded = json_decode((string) $row['categories_json'], true);
-                if (is_array($decoded)) {
-                    $categories = $decoded;
-                }
-            }
-            if (!empty($row['raw_extra_json'])) {
-                $decoded = json_decode((string) $row['raw_extra_json'], true);
-                if (is_array($decoded)) {
-                    $rawExtra = $decoded;
-                }
-            }
-            $existingItems[] = [
-                'id' => (string) ($row['id'] ?? ''),
-                'source_id' => (string) ($row['source_id'] ?? ''),
-                'title' => $row['title'] ?? null,
-                'link' => $row['link'] ?? null,
-                'summary' => $row['summary'] ?? null,
-                'published_at' => $row['published_at'] ?? null,
-                'author' => $row['author'] ?? null,
-                'category' => $row['category'] ?? null,
-                'categories' => $categories,
-                'image_url' => $row['image_url'] ?? null,
-                'raw_guid' => $row['raw_guid'] ?? null,
-                'raw_extra' => $rawExtra,
-                'fetched_at' => $row['fetched_at'] ?? null,
-            ];
-        }
-    }
-}
-
-$itemsById = [];
-foreach ($existingItems as $item) {
-    if (!is_array($item)) {
-        continue;
-    }
-    $id = (string) ($item['id'] ?? '');
-    if ($id === '') {
-        continue;
-    }
-    $itemsById[$id] = $item;
-}
-
+$fetchedById = [];
 foreach ($items as $item) {
     if (!is_array($item)) {
         continue;
@@ -77,60 +28,181 @@ foreach ($items as $item) {
         continue;
     }
 
-    $existing = $itemsById[$id] ?? [];
-    $existingFetchedAt = (string) ($existing['fetched_at'] ?? '');
-    $item['fetched_at'] = $existingFetchedAt !== '' ? $existingFetchedAt : $fetchedAt;
-    $itemsById[$id] = array_merge($existing, $item);
-}
-
-$cutoff = time() - (7 * 24 * 60 * 60);
-$mergedItems = [];
-foreach ($itemsById as $item) {
     $publishedAt = trim((string) ($item['published_at'] ?? ''));
-    $fetchedAtValue = trim((string) ($item['fetched_at'] ?? ''));
     $timestamp = $publishedAt !== '' ? strtotime($publishedAt) : false;
-    if ($timestamp === false && $fetchedAtValue !== '') {
-        $timestamp = strtotime($fetchedAtValue);
-    }
     if ($timestamp === false) {
         $timestamp = time();
-        $item['fetched_at'] = $fetchedAt;
     }
-    if ($timestamp >= $cutoff) {
-        $mergedItems[] = $item;
+    if ($timestamp < $cutoff) {
+        continue;
+    }
+
+    $fetchedById[$id] = $item;
+}
+
+if ($fetchedById === []) {
+    echo "No recent items fetched.\n";
+    exit(0);
+}
+
+$existingById = [];
+$ids = array_keys($fetchedById);
+foreach (array_chunk($ids, 500) as $chunk) {
+    $placeholders = implode(',', array_fill(0, count($chunk), '?'));
+    $stmt = $pdo->prepare(
+        'SELECT id, source_id, title, link, summary, published_at, author, category, categories_json, image_url, raw_guid, raw_extra_json, fetched_at FROM news_items WHERE id IN ('
+        . $placeholders . ')'
+    );
+    if ($stmt === false) {
+        throw new RuntimeException('Failed to prepare existing items query.');
+    }
+    $stmt->execute($chunk);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!is_array($rows)) {
+        continue;
+    }
+
+    foreach ($rows as $row) {
+        $categories = [];
+        $rawExtra = [];
+        if (!empty($row['categories_json'])) {
+            $decoded = json_decode((string) $row['categories_json'], true);
+            if (is_array($decoded)) {
+                $categories = $decoded;
+            }
+        }
+        if (!empty($row['raw_extra_json'])) {
+            $decoded = json_decode((string) $row['raw_extra_json'], true);
+            if (is_array($decoded)) {
+                $rawExtra = $decoded;
+            }
+        }
+        $id = (string) ($row['id'] ?? '');
+        if ($id === '') {
+            continue;
+        }
+        $existingById[$id] = [
+            'id' => $id,
+            'source_id' => (string) ($row['source_id'] ?? ''),
+            'title' => $row['title'] ?? null,
+            'link' => $row['link'] ?? null,
+            'summary' => $row['summary'] ?? null,
+            'published_at' => $row['published_at'] ?? null,
+            'author' => $row['author'] ?? null,
+            'category' => $row['category'] ?? null,
+            'categories' => $categories,
+            'image_url' => $row['image_url'] ?? null,
+            'raw_guid' => $row['raw_guid'] ?? null,
+            'raw_extra' => $rawExtra,
+            'fetched_at' => $row['fetched_at'] ?? null,
+        ];
     }
 }
 
-usort($mergedItems, function (array $a, array $b): int {
-    $aTimestamp = strtotime((string) ($a['published_at'] ?? '')) ?: 0;
-    $bTimestamp = strtotime((string) ($b['published_at'] ?? '')) ?: 0;
-    return $bTimestamp <=> $aTimestamp;
-});
+$normalizeText = static function ($value): string {
+    return trim((string) ($value ?? ''));
+};
 
-$pdo->beginTransaction();
-$pdo->exec('DELETE FROM news_items');
-$stmt = $pdo->prepare(
-    'INSERT INTO news_items (id, source_id, title, link, summary, published_at, author, category, categories_json, image_url, raw_guid, raw_extra_json, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-);
-foreach ($mergedItems as $item) {
-    $categoriesJson = json_encode($item['categories'] ?? [], JSON_UNESCAPED_SLASHES);
-    $rawExtraJson = json_encode($item['raw_extra'] ?? [], JSON_UNESCAPED_SLASHES);
-    $stmt->execute([
-        (string) ($item['id'] ?? ''),
-        (string) ($item['source_id'] ?? ''),
-        $item['title'] ?? null,
-        $item['link'] ?? null,
-        $item['summary'] ?? null,
-        $item['published_at'] ?? null,
-        $item['author'] ?? null,
-        $item['category'] ?? null,
-        $categoriesJson !== false ? $categoriesJson : '[]',
-        $item['image_url'] ?? null,
-        $item['raw_guid'] ?? null,
-        $rawExtraJson !== false ? $rawExtraJson : '[]',
-        $item['fetched_at'] ?? null,
-    ]);
+$normalizeItemForCompare = static function (array $item) use ($normalizeText): array {
+    $categories = $item['categories'] ?? [];
+    if (!is_array($categories)) {
+        $categories = [];
+    }
+    $categories = array_values($categories);
+    sort($categories, SORT_STRING);
+
+    $rawExtra = $item['raw_extra'] ?? [];
+    if (!is_array($rawExtra)) {
+        $rawExtra = [];
+    }
+    ksort($rawExtra);
+
+    return [
+        'source_id' => $normalizeText($item['source_id'] ?? ''),
+        'title' => $normalizeText($item['title'] ?? null),
+        'link' => $normalizeText($item['link'] ?? null),
+        'summary' => $normalizeText($item['summary'] ?? null),
+        'published_at' => $normalizeText($item['published_at'] ?? null),
+        'author' => $normalizeText($item['author'] ?? null),
+        'category' => $normalizeText($item['category'] ?? null),
+        'categories' => $categories,
+        'image_url' => $normalizeText($item['image_url'] ?? null),
+        'raw_guid' => $normalizeText($item['raw_guid'] ?? null),
+        'raw_extra' => $rawExtra,
+        'fetched_at' => $normalizeText($item['fetched_at'] ?? null),
+    ];
+};
+
+$itemsToUpsert = [];
+$unchanged = 0;
+
+foreach ($fetchedById as $id => $item) {
+    $existing = $existingById[$id] ?? null;
+    $existingFetchedAt = is_array($existing) ? trim((string) ($existing['fetched_at'] ?? '')) : '';
+    $item['fetched_at'] = $existingFetchedAt !== '' ? $existingFetchedAt : $fetchedAt;
+
+    if (!is_array($existing)) {
+        $itemsToUpsert[] = $item;
+        continue;
+    }
+
+    $candidate = $normalizeItemForCompare($item);
+    $current = $normalizeItemForCompare($existing);
+
+    if ($candidate !== $current) {
+        $itemsToUpsert[] = $item;
+    } else {
+        $unchanged++;
+    }
 }
-$pdo->commit();
 
-echo 'Saved ' . count($mergedItems) . " items to the database.\n";
+$upserted = 0;
+if ($itemsToUpsert !== []) {
+    $pdo->beginTransaction();
+    $stmt = $pdo->prepare(
+        'INSERT INTO news_items (id, source_id, title, link, summary, published_at, author, category, categories_json, image_url, raw_guid, raw_extra_json, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           source_id = VALUES(source_id),
+           title = VALUES(title),
+           link = VALUES(link),
+           summary = VALUES(summary),
+           published_at = VALUES(published_at),
+           author = VALUES(author),
+           category = VALUES(category),
+           categories_json = VALUES(categories_json),
+           image_url = VALUES(image_url),
+           raw_guid = VALUES(raw_guid),
+           raw_extra_json = VALUES(raw_extra_json),
+           fetched_at = VALUES(fetched_at)'
+    );
+    if ($stmt === false) {
+        throw new RuntimeException('Failed to prepare upsert statement.');
+    }
+
+    foreach ($itemsToUpsert as $item) {
+        $categoriesJson = json_encode($item['categories'] ?? [], JSON_UNESCAPED_SLASHES);
+        $rawExtraJson = json_encode($item['raw_extra'] ?? [], JSON_UNESCAPED_SLASHES);
+        $stmt->execute([
+            (string) ($item['id'] ?? ''),
+            (string) ($item['source_id'] ?? ''),
+            $item['title'] ?? null,
+            $item['link'] ?? null,
+            $item['summary'] ?? null,
+            $item['published_at'] ?? null,
+            $item['author'] ?? null,
+            $item['category'] ?? null,
+            $categoriesJson !== false ? $categoriesJson : '[]',
+            $item['image_url'] ?? null,
+            $item['raw_guid'] ?? null,
+            $rawExtraJson !== false ? $rawExtraJson : '[]',
+            $item['fetched_at'] ?? null,
+        ]);
+        $upserted++;
+    }
+    $pdo->commit();
+}
+
+echo 'Fetched ' . count($fetchedById)
+    . ' recent items (' . $upserted
+    . ' upserted, ' . $unchanged
+    . " unchanged).\n";

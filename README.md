@@ -72,7 +72,20 @@ Fetch and store news items using the database-backed fetcher:
 php app/Console/fetch_news.php
 ```
 
-This reads sources from `news_sources` and writes into `news_items`.
+This reads sources from `news_sources` and upserts into `news_items` (only when items changed).
+
+Clean up items older than 7 days:
+
+```sh
+php app/Console/cleanup_news.php
+```
+
+Cron examples:
+
+```cron
+*/10 * * * * php /path/to/app/Console/fetch_news.php >> /var/log/enquadramento/fetch_news.log 2>&1
+15 3 * * * php /path/to/app/Console/cleanup_news.php >> /var/log/enquadramento/cleanup_news.log 2>&1
+```
 
 ## Category Tools
 

@@ -24,7 +24,22 @@ This applies all SQL files under `database/`.
 php app/Console/fetch_news.php
 ```
 
-This reads `news_sources` and writes to `news_items`. It requires a working DB connection.
+This reads `news_sources` and upserts into `news_items`. It only updates rows when an item changed and preserves the original `fetched_at`. It requires a working DB connection.
+
+## Cleanup
+
+```sh
+php app/Console/cleanup_news.php
+```
+
+Deletes items older than 7 days (using `published_at`, or `fetched_at` when `published_at` is missing). This can run independently from the fetch job.
+
+## Cron examples
+
+```cron
+*/10 * * * * php /path/to/app/Console/fetch_news.php >> /var/log/enquadramento/fetch_news.log 2>&1
+15 3 * * * php /path/to/app/Console/cleanup_news.php >> /var/log/enquadramento/cleanup_news.log 2>&1
+```
 
 ## Category tooling
 
