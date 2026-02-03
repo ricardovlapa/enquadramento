@@ -1,16 +1,55 @@
-# Minimal PHP Blog Starter
+# Enquadramento
 
-Small MVC-style PHP blog with JSON-backed posts and tags.
+Enquadramento is a PHP news aggregation and editorial site. It ingests RSS feeds into a MySQL database, normalizes and groups news categories, and renders news and opinion sections using a lightweight MVC router.
+
+## Features
+
+- News ingestion from RSS into `news_sources` and `news_items`
+- Curated category groups with training mappings for normalization
+- Opinion articles and authors served from the database
+- Share links with redirect tracking
+
+## Requirements
+
+- PHP 8.x
+- Composer
+- MySQL (or compatible) database
 
 ## Setup
 
-1) Install dependencies and autoload:
+1) Install dependencies (only needed once):
 
 ```sh
+composer install
 composer dump-autoload
 ```
 
-2) Run locally:
+2) Configure environment:
+
+Create `.env.local` with the database and site settings.
+
+```env
+APP_ENV=development
+DB_DSN=mysql:host=127.0.0.1;port=3306;dbname=enquadramento;charset=utf8mb4
+DB_USER=your_user
+DB_PASS=your_pass
+
+SITE_TITLE=Enquadramento
+SITE_TAGLINE=O essencial da atualidade, organizado por tema.
+SITE_DESCRIPTION=O essencial da atualidade, organizado por tema.
+SITE_BASE_URL=https://example.com
+SITE_ALLOWED_HOSTS=example.com,www.example.com
+SITE_SOCIAL_IMAGE=https://example.com/assets/images/socialImage.jpg
+AUTHOR_NAME=Site Author
+```
+
+3) Run migrations:
+
+```sh
+php scripts/migrate.php
+```
+
+4) Start the local server:
 
 ```sh
 composer serve
@@ -18,81 +57,33 @@ composer serve
 
 Then open `http://localhost:8000`.
 
-## Content
+## Data Sources
 
-Posts live in `app/Data/posts.json`.
-Tags live in `app/Data/tags.json`.
-Post images live in `public/uploads`.
+The app uses the database for news items, sources, authors, and articles. These JSON files remain for category management:
 
-## Environment
+- `app/Data/categories.json` for curated category groups
+- `app/Data/category_training.json` for raw-to-slug mapping overrides
 
-Create `.env.local` to override settings (example):
+## News Fetching
 
-```env
-APP_ENV=development
-AD_SLOTS_VISIBLE=true
-SITE_TITLE=Starter Blog
-SITE_TAGLINE=Thoughts, notes, and reflections on the present.
-SITE_DESCRIPTION=Short posts about culture, community, and the details that shape our days.
-SITE_BASE_URL=https://example.com
-SITE_ALLOWED_HOSTS=example.com,www.example.com
-SITE_SOCIAL_IMAGE=https://example.com/assets/images/socialImage.jpg
-AUTHOR_NAME=Site Author
-SITE_LOGO=/assets/images/rl_logo.png
-SITE_FOOTER_AVATAR=/assets/images/myPhoto.png
-SOCIAL_FACEBOOK=
-SOCIAL_INSTAGRAM=
-SOCIAL_LINKEDIN=
-GOOGLE_ANALYTICS_ID=
-BLOG_FEED_ENABLED=false
-```
-
-## SEO & Social
-
-- Set `SITE_BASE_URL` and `SITE_SOCIAL_IMAGE` in `.env.local` or update `app/config.php`.
-- `SITE_SOCIAL_IMAGE` should be an absolute URL to a ~1200x630 image.
-
-## Database (news items, sources, authors, articles)
-
-News items, sources, authors, and articles can be served from MySQL when `DB_DSN` (or `MYSQL_DSN`) is set. JSON remains a fallback.
-
-1) Run migrations:
-
-```sh
-php scripts/migrate.php
-```
-
-2) Seed from existing JSON (optional):
-
-```sh
-php scripts/import_news_items.php
-```
-
-3) Import news sources (optional, for DB-backed fetch):
-
-```sh
-php scripts/import_news_sources.php
-```
-
-4) Import opinion authors and articles (optional):
-
-```sh
-php scripts/import_authors.php
-php scripts/import_articles.php
-```
-
-5) Fetch news into the DB (also writes JSON):
+Fetch and store news items using the database-backed fetcher:
 
 ```sh
 php app/Console/fetch_news.php
 ```
 
+This reads sources from `news_sources` and writes into `news_items`.
+
+## Category Tools
+
+- `php app/Console/report_dynamic_categories.php` to inspect dynamic categories from news items
+- `php app/Console/suggest_category_matches.php` to suggest training mappings
+
+## SEO & Social
+
+- Set `SITE_BASE_URL` and `SITE_SOCIAL_IMAGE` in `.env.local`.
+- `SITE_SOCIAL_IMAGE` should be an absolute URL to a ~1200x630 image.
+
 ## RSS
 
-The feed route is disabled by default. Enable it by setting `BLOG_FEED_ENABLED=true` and re-adding the `/feed.xml` route in `app/routes.php` if you want RSS.
-
-## Starter Checklist
-
-- Update `app/config.php` defaults or override values in `.env.local` (title, description, baseUrl, socialImage, allowedHosts, author, social links).
-- Replace the logo and favicon assets in `public/assets`.
-- Add or remove tags in `app/Data/tags.json`.
+The feed route is disabled by default. Enable it by setting `BLOG_FEED_ENABLED=true` and re-adding the `/feed.xml` route in `app/routes.php`.
