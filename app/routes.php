@@ -3,7 +3,8 @@
 use App\Controller\HomeController;
 use App\Controller\NewsController;
 use App\Controller\OpinionController;
-use App\Controller\EditorialPrivacyController;
+use App\Controller\AboutController;
+use App\Controller\LegalEditorialController;
 use App\Controller\NotFoundController;
 use App\Controller\ShareController;
 use App\Model\NewsRepository;
@@ -16,8 +17,20 @@ return function (Router $router, array $site, NewsRepository $news, OpinionRepos
         (new HomeController($site, $news, $opinions))->show();
     });
 
-    $router->get('/nota-editorial-e-privacidade', function () use ($site) {
-        (new EditorialPrivacyController($site))->show();
+    $router->get('/sobre', function () use ($site) {
+        (new AboutController($site))->show();
+    });
+
+    $router->get('/nota-editorial', function () use ($site) {
+        (new LegalEditorialController($site))->editorial();
+    });
+
+    $router->get('/termos-de-utilizacao', function () use ($site) {
+        (new LegalEditorialController($site))->terms();
+    });
+
+    $router->get('/politica-de-privacidade', function () use ($site) {
+        (new LegalEditorialController($site))->privacy();
     });
 
     $router->get('/opiniao-enquadramento', function () use ($site, $opinions) {

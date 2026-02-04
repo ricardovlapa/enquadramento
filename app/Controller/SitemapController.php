@@ -21,7 +21,10 @@ class SitemapController extends BaseController
 
         $urls = [
             ['loc' => $baseUrl . '/', 'priority' => '1.0'],
-            ['loc' => $baseUrl . '/nota-editorial-e-de-privacidade', 'priority' => '0.5'],
+            ['loc' => $baseUrl . '/sobre', 'priority' => '0.5'],
+            ['loc' => $baseUrl . '/nota-editorial', 'priority' => '0.5'],
+            ['loc' => $baseUrl . '/termos-de-utilizacao', 'priority' => '0.5'],
+            ['loc' => $baseUrl . '/politica-de-privacidade', 'priority' => '0.5'],
         ];
 
         $esc = fn(string $value): string => htmlspecialchars($value, ENT_XML1, 'UTF-8');
