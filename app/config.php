@@ -63,9 +63,14 @@ $siteTagline = env_string('SITE_TAGLINE', 'O essencial da atualidade, organizado
 $siteDescription = env_string('SITE_DESCRIPTION', 'O essencial da atualidade, organizado por tema.');
 $siteBaseUrl = env_string('SITE_BASE_URL', '');
 $defaultSocialImagePath = '/assets/images/socialImage.jpg';
+$defaultAboutImagePath = '/assets/images/default_image_enquadramento.png';
 $siteSocialImage = env_string(
     'SITE_SOCIAL_IMAGE',
     $siteBaseUrl !== '' ? rtrim($siteBaseUrl, '/') . $defaultSocialImagePath : $defaultSocialImagePath
+);
+$aboutLogo = env_string(
+    'ABOUT_LOGO',
+    $siteBaseUrl !== '' ? rtrim($siteBaseUrl, '/') . $defaultAboutImagePath : $defaultAboutImagePath
 );
 
 $authorName = env_string('AUTHOR_NAME', 'Site Author');
@@ -187,7 +192,7 @@ return [
             'name' => $authorName,
         ],
         'social' => [
-            'facebook' => env_string('SOCIAL_FACEBOOK', ''),
+            'facebook' => env_string('SOCIAL_FACEBOOK', 'https://www.facebook.com/news.enquadramento/'),
             'instagram' => env_string('SOCIAL_INSTAGRAM', ''),
             'linkedin' => env_string('SOCIAL_LINKEDIN', ''),
         ],
@@ -254,8 +259,16 @@ return [
                 'editorialLabel' => env_string('FOOTER_EDITORIAL_LABEL', ''),
                 'editorialUrl' => env_string('FOOTER_EDITORIAL_URL', ''),
             ],
+            'about' => [
+                'title' => env_string('ABOUT_TITLE', 'Sobre o Enquadramento.'),
+                'description' => env_string('ABOUT_DESCRIPTION', 'Sobre o Enquadramento.'),
+                'text' => env_string('ABOUT_TEXT', 'O Enquadramento é um projeto editorial independente dedicado à organização da informação. Num tempo de excesso de notícias, procura reunir o essencial da atualidade, por tema, facilitando o acesso a diferentes fontes e promovendo uma leitura mais informada.'),
+                'logo' => env_string('ABOUT_LOGO', $aboutLogo),
+                'logoAlt' => env_string('ABOUT_LOGO_ALT', $siteTitle),
+            ],
             'editorial' => [
-                'title' => env_string('EDITORIAL_TITLE', 'Nota editorial e de privacidade'),
+                'title' => env_string('EDITORIAL_TITLE', 'Nota Editorial'),
+                'description' => env_string('EDITORIAL_DESCRIPTION', 'Nota editorial.'),
                 'sections' => [
                     [
                         'title' => env_string('EDITORIAL_SECTION1_TITLE', 'Autoria e responsabilidade editorial'),
@@ -302,6 +315,74 @@ return [
                             env_string(
                                 'EDITORIAL_SECTION4_P1',
                                 'Para qualquer esclarecimento relacionado com este site ou com os seus conteúdos, poderá ser utilizado o contacto disponibilizado na página respetiva.'
+                            ),
+                        ],
+                    ],
+                ],
+            ],
+            'terms' => [
+                'title' => env_string('TERMS_TITLE', 'Termos de Utilização'),
+                'description' => env_string('TERMS_DESCRIPTION', 'Termos de utilização.'),
+                'sections' => [
+                    [
+                        'paragraphs' => [
+                            env_string(
+                                'TERMS_SECTION1_P1',
+                                'O presente site, Enquadramento, tem como objetivo a agregação e organização de conteúdos informativos provenientes de fontes externas, disponibilizados através de feeds RSS públicos.'
+                            ),
+                            env_string(
+                                'TERMS_SECTION1_P2',
+                                'O Enquadramento não produz nem reproduz conteúdos jornalísticos de terceiros, limitando-se a apresentar títulos e ligações que redirecionam o utilizador para os respetivos websites de origem.'
+                            ),
+                            env_string(
+                                'TERMS_SECTION1_P3',
+                                'O acesso e utilização deste site são de caráter livre e gratuito, sendo da responsabilidade do utilizador a forma como utiliza a informação disponibilizada.'
+                            ),
+                            env_string(
+                                'TERMS_SECTION1_P4',
+                                'O Enquadramento não garante a exatidão, atualidade ou integridade dos conteúdos externos, não assumindo qualquer responsabilidade por erros, omissões ou alterações efetuadas pelas fontes originais.'
+                            ),
+                            env_string(
+                                'TERMS_SECTION1_P5',
+                                'O Enquadramento não se responsabiliza pelo conteúdo, políticas ou práticas de websites externos para os quais disponibiliza ligações.'
+                            ),
+                            env_string(
+                                'TERMS_SECTION1_P6',
+                                'A utilização deste site implica a aceitação destes Termos de Utilização.'
+                            ),
+                        ],
+                    ],
+                ],
+            ],
+            'privacy' => [
+                'title' => env_string('PRIVACY_TITLE', 'Política de Privacidade'),
+                'description' => env_string('PRIVACY_DESCRIPTION', 'Política de privacidade.'),
+                'sections' => [
+                    [
+                        'paragraphs' => [
+                            env_string(
+                                'PRIVACY_SECTION1_P1',
+                                'O Enquadramento respeita a privacidade dos seus utilizadores e compromete-se a proteger quaisquer dados pessoais eventualmente recolhidos.'
+                            ),
+                            env_string(
+                                'PRIVACY_SECTION1_P2',
+                                'Atualmente, este site não recolhe dados pessoais identificáveis dos visitantes, não disponibiliza formulários de registo nem sistemas de autenticação.'
+                            ),
+                            env_string(
+                                'PRIVACY_SECTION1_P3',
+                                'Poderão ser recolhidos, de forma automática, dados técnicos básicos, como endereço IP, tipo de navegador ou páginas visitadas, exclusivamente para fins estatísticos e de funcionamento do serviço.'
+                            ),
+                            env_string(
+                                'PRIVACY_SECTION1_P4',
+                                'O Enquadramento não partilha, vende ou cede dados a terceiros para fins comerciais.'
+                            ),
+                            env_string(
+                                'PRIVACY_SECTION1_P5',
+                                'Caso no futuro venham a ser utilizados serviços externos de análise de tráfego ou publicidade, esta política será atualizada em conformidade com o Regulamento Geral de Proteção de Dados (RGPD).'
+                            ),
+                            env_string(
+                                'PRIVACY_SECTION1_P6',
+                                'O utilizador poderá, a qualquer momento, solicitar esclarecimentos sobre esta política através dos contactos disponibilizados no site.'
                             ),
                         ],
                     ],

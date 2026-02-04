@@ -75,6 +75,7 @@
           <?php $mainNav = []; ?>
           <?php $mainNav[] = ['label' => $site['navHomeLabel'] ?? 'Início', 'href' => '/']; ?>
           <?php $mainNav[] = ['label' => 'Todas as Notícias', 'href' => '/todas-as-noticias']; ?>
+          <?php $mainNav[] = ['label' => 'Sobre', 'href' => '/sobre']; ?>
           <?php foreach (($site['newsCategories'] ?? []) as $category): ?>
             <?php if (!is_array($category)): ?>
               <?php continue; ?>
@@ -244,17 +245,18 @@
               </a>
             <?php endif; ?>
           </div>
-          <a class="button button--light footer-cta" href="/nota-editorial-e-privacidade">Nota editorial e privacidade</a>
         </div>
         <div class="footer-links">
           <a href="/">Início</a>
           <a href="/todas-as-noticias">Todas as notícias</a>
           <a href="/opiniao-enquadramento">Opinião</a>
+          <a href="#">Contactos</a>
         </div>
         <div class="footer-links">
-          <a href="#">Contactos</a>
-          <a href="/nota-editorial-e-privacidade">Nota editorial</a>
-          <a href="/nota-editorial-e-privacidade">Privacidade</a>
+          <a href="/sobre">Sobre</a>
+          <a href="/nota-editorial">Nota Editorial</a>
+          <a href="/termos-de-utilizacao">Termos de Utilização</a>
+          <a href="/politica-de-privacidade">Política de Privacidade</a>
         </div>
       </div>
     </div>

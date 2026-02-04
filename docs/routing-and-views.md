@@ -10,7 +10,10 @@ Routes are defined in `app/routes.php` and mapped to controllers in `app/Control
 - `/noticias/categoria/opiniao-enquadramento` -> `OpinionController::index` (alias route)
 - `/opiniao-enquadramento` -> `OpinionController::index`
 - `/opiniao-enquadramento/{slug}` -> `OpinionController::show`
-- `/nota-editorial-e-privacidade` -> `EditorialPrivacyController::show`
+- `/sobre` -> `AboutController::show`
+- `/nota-editorial` -> `LegalEditorialController::editorial`
+- `/termos-de-utilizacao` -> `LegalEditorialController::terms`
+- `/politica-de-privacidade` -> `LegalEditorialController::privacy`
 - `/share/{id}`, `/s/{token}`, `/r/{token}` -> share and redirect flow (only registered when DB is available)
 
 ## Views
@@ -20,7 +23,8 @@ Routes are defined in `app/routes.php` and mapped to controllers in `app/Control
 - `app/View/news.php` renders the news list, filters, and infinite scroll loader.
 - `app/View/partials/news_items.php` renders a list of news cards.
 - `app/View/opinion_index.php` and `app/View/opinion_article.php` render the opinion section.
-- `app/View/editorial_privacy.php` renders the editorial page.
+- `app/View/about.php` renders the about page.
+- `app/View/legal_editorial.php`, `app/View/legal_terms.php`, and `app/View/legal_privacy.php` render the legal pages.
 - `app/View/share_landing.php` renders share previews.
 
 ## Partial loading
