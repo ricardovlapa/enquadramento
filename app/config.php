@@ -74,6 +74,8 @@ $aboutLogo = env_string(
 );
 
 $authorName = env_string('AUTHOR_NAME', 'Site Author');
+$geralEmail = env_string('GERAL_EMAIL', 'geral@enquadramento.news');
+$opiniaoEmail = env_string('OPINIAO_EMAIL', 'opiniao@enquadramento.news');
 $newsCategoriesFile = __DIR__ . '/Data/categories.json';
 $newsCategoryTrainingFile = env_string('NEWS_CATEGORY_TRAINING_DATA', __DIR__ . '/Data/category_training.json');
 $newsCategoriesRaw = load_json_array($newsCategoriesFile);
@@ -386,6 +388,46 @@ return [
                             ),
                         ],
                     ],
+                ],
+            ],
+            'contact' => [
+                'title' => env_string('CONTACT_TITLE', 'Contactos'),
+                'description' => env_string('CONTACT_DESCRIPTION', 'Contactos.'),
+                'sections' => [
+                    [
+                        'paragraphs' => [
+                            env_string(
+                                'CONTACT_INTRO',
+                                'Para qualquer questão relacionada com o Enquadramento, poderá utilizar os seguintes contactos:'
+                            ),
+                        ],
+                    ],
+                    [
+                        'title' => env_string('CONTACT_SECTION1_TITLE', 'Geral'),
+                        'paragraphs' => [
+                            env_string(
+                                'CONTACT_SECTION1_P1',
+                                $geralEmail
+                            ),
+                        ],
+                    ],
+                    [
+                        'title' => env_string('CONTACT_SECTION2_TITLE', 'Opinião'),
+                        'paragraphs' => [
+                            env_string(
+                                'CONTACT_SECTION2_P1',
+                                $opiniaoEmail
+                            ),
+                        ],
+                    ],
+                    [
+                        'paragraphs' => [
+                            env_string(
+                                'CONTACT_SECTION3_P1',
+                                'Os contactos destinam-se exclusivamente a comunicações relacionadas com o projeto editorial.'
+                            ),
+                        ],
+                    ]
                 ],
             ],
         ],
