@@ -4,6 +4,7 @@ use App\Controller\HomeController;
 use App\Controller\NewsController;
 use App\Controller\OpinionController;
 use App\Controller\AboutController;
+use App\Controller\ContactController;
 use App\Controller\LegalEditorialController;
 use App\Controller\NotFoundController;
 use App\Controller\ShareController;
@@ -19,6 +20,10 @@ return function (Router $router, array $site, NewsRepository $news, OpinionRepos
 
     $router->get('/sobre', function () use ($site) {
         (new AboutController($site))->show();
+    });
+
+    $router->get('/contactos', function () use ($site) {
+        (new ContactController($site))->show();
     });
 
     $router->get('/nota-editorial', function () use ($site) {
