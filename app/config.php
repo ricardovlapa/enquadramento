@@ -226,22 +226,6 @@ return [
                     'Ainda não há notícias. Execute o fetch manual para carregar itens.'
                 ),
             ],
-            'blog' => [
-                'title' => env_string('BLOG_TITLE', 'Todos os artigos'),
-                'emptyPosts' => env_string('BLOG_EMPTY_POSTS', 'Ainda não há artigos. Adicione um a posts.json.'),
-                'emptyTag' => env_string('BLOG_EMPTY_TAG', 'Sem artigos para a tag “%s”.'),
-                'tagsLabel' => env_string('BLOG_TAGS_LABEL', 'Tags'),
-                'feed' => [
-                    'enabled' => env_bool('BLOG_FEED_ENABLED', false),
-                    'title' => env_string('BLOG_FEED_TITLE', 'Acompanha as novidades'),
-                    'description' => env_string(
-                        'BLOG_FEED_DESCRIPTION',
-                        'Atualizações mensais, sem ruído. Subscreve no teu leitor de feeds favorito.'
-                    ),
-                    'ctaLabel' => env_string('BLOG_FEED_CTA_LABEL', 'Abrir feed'),
-                    'ctaUrl' => env_string('BLOG_FEED_CTA_URL', '/feed.xml'),
-                ],
-            ],
             'news' => [
                 'title' => env_string('NEWS_TITLE', 'Notícias'),
                 'emptyItems' => env_string(

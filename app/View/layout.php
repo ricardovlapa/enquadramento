@@ -18,9 +18,6 @@
   <?php if (!empty($meta['canonical'])): ?>
     <link rel="canonical" href="<?= e($meta['canonical']) ?>">
   <?php endif; ?>
-  <?php if (!empty($meta['rss'])): ?>
-    <link rel="alternate" type="application/rss+xml" title="<?= e($site['title'] ?? 'Feed') ?>" href="<?= e($meta['rss']) ?>">
-  <?php endif; ?>
   <?php if (!empty($meta['og'])): ?>
     <meta property="og:title" content="<?= e($meta['og']['title'] ?? '') ?>">
     <meta property="og:description" content="<?= e($meta['og']['description'] ?? '') ?>">

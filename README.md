@@ -96,7 +96,3 @@ Cron examples:
 
 - Set `SITE_BASE_URL` and `SITE_SOCIAL_IMAGE` in `.env.local`.
 - `SITE_SOCIAL_IMAGE` should be an absolute URL to a ~1200x630 image.
-
-## RSS
-
-The feed route is disabled by default. Enable it by setting `BLOG_FEED_ENABLED=true` and re-adding the `/feed.xml` route in `app/routes.php`.

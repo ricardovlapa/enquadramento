@@ -89,14 +89,10 @@ class BaseController
 
         array_unshift($jsonLd, $webSiteSchema);
 
-        $rssEnabled = $this->site['ui']['blog']['feed']['enabled'] ?? true;
-        $rssUrl = $rssEnabled ? ($baseUrl . '/feed.xml') : '';
-
         return [
             'description' => $description,
             'canonical' => $canonical,
             'robots' => $robots,
-            'rss' => $rssUrl,
             'og' => $og,
             'twitter' => $twitter,
             'jsonLd' => $jsonLd,
