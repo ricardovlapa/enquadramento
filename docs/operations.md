@@ -26,6 +26,19 @@ php app/Console/fetch_news.php
 
 This reads `news_sources` and upserts into `news_items`. It only updates rows when an item changed and preserves the original `fetched_at`. It requires a working DB connection.
 
+Retry behavior for transient source failures:
+
+- Retries happen when at least one source fails HTTP fetch or XML parsing.
+- Defaults: up to 5 attempts with exponential backoff (`1s`, `2s`, `4s`, `8s` between attempts).
+- If failures persist after the last attempt, the command exits with status `1`.
+
+Optional env vars:
+
+```env
+FETCH_NEWS_MAX_ATTEMPTS=5
+FETCH_NEWS_RETRY_BASE_DELAY_SECONDS=1
+```
+
 ## Cleanup
 
 ```sh

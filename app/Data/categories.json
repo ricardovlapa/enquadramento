@@ -21,6 +21,16 @@
                 "slug": "crise-na-gronelandia",
                 "label": "Crise na Gronelândia",
                 "subtitle": "Evolução política, social e humanitária."
+            },
+            {
+                "slug": "medio-oriente",
+                "label": "Médio Oriente",
+                "subtitle": "Crise no médio oriente, conflitos e diplomacia."
+            },
+            {
+                "slug": "operacao-furia-epica",
+                "label": "Operação Fúria Épica",
+                "subtitle": "A operação militar e seus desdobramentos."
             }
         ]
     },
