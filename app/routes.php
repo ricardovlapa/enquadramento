@@ -8,6 +8,7 @@ use App\Controller\ContactController;
 use App\Controller\LegalEditorialController;
 use App\Controller\NotFoundController;
 use App\Controller\ShareController;
+use App\Controller\SitemapController;
 use App\Model\NewsRepository;
 use App\Model\OpinionRepository;
 use App\Model\RedirectRepository;
@@ -16,6 +17,10 @@ use App\Router;
 return function (Router $router, array $site, NewsRepository $news, OpinionRepository $opinions, ?RedirectRepository $redirects = null): void {
     $router->get('/', function () use ($site, $news, $opinions) {
         (new HomeController($site, $news, $opinions))->show();
+    });
+
+    $router->get('/sitemap.xml', function () use ($site, $news, $opinions) {
+        (new SitemapController($site, $news, $opinions))->show();
     });
 
     $router->get('/sobre', function () use ($site) {
@@ -48,10 +53,6 @@ return function (Router $router, array $site, NewsRepository $news, OpinionRepos
 
     $router->get('/todas-as-noticias', function () use ($site, $news) {
         (new NewsController($site, $news))->index();
-    });
-
-    $router->get('/noticias/categoria/opiniao-enquadramento', function () use ($site, $opinions) {
-        (new OpinionController($site, $opinions))->index();
     });
 
     $router->get('/noticias/categoria/{category}', function (array $params) use ($site, $news) {

@@ -23,14 +23,6 @@ class NewsController extends BaseController
         $this->renderNewsList($categorySlug, $sourceId);
     }
 
-    public function categories(): void
-    {
-        $categories = $this->news->categories();
-        $this->render('news_categories', [
-            'categories' => $categories,
-        ], 'Categorias');
-    }
-
     public function category(string $slug): void
     {
         $slug = trim($slug);

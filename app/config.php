@@ -234,8 +234,6 @@ return [
                 ),
                 'emptyCategory' => env_string('NEWS_EMPTY_CATEGORY', 'Sem notícias para a categoria “%s”.'),
                 'categoriesLabel' => env_string('NEWS_CATEGORIES_LABEL', 'Categorias'),
-                'categoriesTitle' => env_string('NEWS_CATEGORIES_TITLE', 'Categorias de notícias'),
-                'emptyCategories' => env_string('NEWS_EMPTY_CATEGORIES', 'Ainda não há categorias disponíveis.'),
             ],
             'footer' => [
                 'text' => env_string(
