@@ -24,10 +24,14 @@
     "Crónica": "opiniao-outras-fontes",
     "Livros": "cultura",
     "POLÍTICA NACIONAL": "politica",
+    "Partidos políticos": "politica",
+    "Pedro Passos Coelho": "politica",
     "Poupança": "economia",
     "Justiça": "pais",
     "Podcast": "podcasts",
     "Nobel da Paz": "mundo",
     "Ciência & Saúde": "saude",
-    "Médio Oriente": "mundo"
+    "Médio Oriente": "medio-oriente",
+    "Crise no Médio Oriente": "medio-oriente",
+    "Crise no médio oriente": "medio-oriente"
 }

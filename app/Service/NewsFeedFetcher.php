@@ -8,10 +8,27 @@ use PDO;
 class NewsFeedFetcher
 {
     private ?PDO $pdo;
+    /**
+     * @var array<int, array<string, string>>
+     */
+    private array $errors = [];
 
     public function __construct(?PDO $pdo = null)
     {
         $this->pdo = $pdo;
+    }
+
+    public function hasErrors(): bool
+    {
+        return $this->errors !== [];
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     /**
@@ -19,6 +36,7 @@ class NewsFeedFetcher
      */
     public function fetch(): array
     {
+        $this->errors = [];
         $sources = $this->readSources();
         $items = [];
 
@@ -104,15 +122,21 @@ class NewsFeedFetcher
         $url = (string) ($source['url'] ?? '');
         $sourceId = (string) ($source['id'] ?? '');
         if ($url === '' || $sourceId === '') {
+            $this->recordError(
+                'invalid_source_config',
+                'Source is missing required id or url.',
+                $sourceId,
+                $url
+            );
             return [];
         }
 
-        $content = $this->fetchUrl($url);
+        $content = $this->fetchUrl($url, $sourceId);
         if ($content === null) {
             return [];
         }
 
-        $xml = $this->parseXml($content);
+        $xml = $this->parseXml($content, $sourceId, $url);
         if ($xml === null) {
             return [];
         }
@@ -137,7 +161,7 @@ class NewsFeedFetcher
         return $items;
     }
 
-    private function fetchUrl(string $url): ?string
+    private function fetchUrl(string $url, string $sourceId): ?string
     {
         $context = stream_context_create([
             'http' => [
@@ -150,26 +174,84 @@ class NewsFeedFetcher
             ],
         ]);
 
-        $content = @file_get_contents($url, false, $context);
+        $errorMessage = '';
+        set_error_handler(static function (int $severity, string $message) use (&$errorMessage): bool {
+            $errorMessage = trim($message);
+            return true;
+        });
+        $content = file_get_contents($url, false, $context);
+        restore_error_handler();
+
         if ($content === false) {
-            fwrite(STDERR, 'Failed to fetch ' . $url . PHP_EOL);
+            if ($errorMessage === '') {
+                $lastError = error_get_last();
+                if (is_array($lastError)) {
+                    $errorMessage = trim((string) ($lastError['message'] ?? ''));
+                }
+            }
+
+            $this->recordError(
+                'fetch_failed',
+                'Failed to fetch source feed.',
+                $sourceId,
+                $url,
+                $errorMessage !== '' ? $errorMessage : 'Unknown fetch error.'
+            );
             return null;
         }
 
         return $content;
     }
 
-    private function parseXml(string $content): ?\SimpleXMLElement
+    private function parseXml(string $content, string $sourceId, string $url): ?\SimpleXMLElement
     {
         libxml_use_internal_errors(true);
+        libxml_clear_errors();
         $xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
         if ($xml === false) {
+            $libxmlErrors = libxml_get_errors();
+            $detail = '';
+            if (isset($libxmlErrors[0]) && isset($libxmlErrors[0]->message)) {
+                $detail = trim((string) $libxmlErrors[0]->message);
+            }
+            if ($detail === '') {
+                $detail = 'Unknown XML parse error.';
+            }
+
+            $this->recordError(
+                'xml_parse_failed',
+                'Failed to parse XML feed.',
+                $sourceId,
+                $url,
+                $detail
+            );
             libxml_clear_errors();
-            fwrite(STDERR, 'Failed to parse XML feed.' . PHP_EOL);
             return null;
         }
 
+        libxml_clear_errors();
         return $xml;
+    }
+
+    private function recordError(
+        string $type,
+        string $message,
+        string $sourceId = '',
+        string $url = '',
+        string $detail = ''
+    ): void {
+        $error = [
+            'type' => trim($type),
+            'message' => trim($message),
+            'source_id' => trim($sourceId),
+            'url' => trim($url),
+        ];
+
+        if ($detail !== '') {
+            $error['detail'] = trim($detail);
+        }
+
+        $this->errors[] = $error;
     }
 
     /**

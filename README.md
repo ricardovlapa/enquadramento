@@ -74,6 +74,15 @@ php app/Console/fetch_news.php
 
 This reads sources from `news_sources` and upserts into `news_items` (only when items changed).
 
+If one or more sources fail to fetch/parse, the command retries automatically (defaults: max 5 attempts, exponential delays `1s`, `2s`, `4s`, `8s`). If failures still exist after the last attempt, it exits with status `1`.
+
+Optional retry env vars:
+
+```env
+FETCH_NEWS_MAX_ATTEMPTS=5
+FETCH_NEWS_RETRY_BASE_DELAY_SECONDS=1
+```
+
 Clean up items older than 7 days:
 
 ```sh
