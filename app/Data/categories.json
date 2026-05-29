@@ -3,34 +3,9 @@
         "label": "Destaques",
         "items": [
             {
-                "slug": "presidenciais-2026",
-                "label": "Presidenciais 2026",
-                "subtitle": "A corrida presidencial, candidatos e propostas."
-            },
-            {
-                "slug": "guerra-na-ucrania",
-                "label": "Guerra na Ucrânia",
-                "subtitle": "Evolução política, social e humanitária."
-            },
-            {
-                "slug": "crise-na-venezuela",
-                "label": "Crise na Venezuela",
-                "subtitle": "Evolução política, social e humanitária."
-            },
-            {
-                "slug": "crise-na-gronelandia",
-                "label": "Crise na Gronelândia",
-                "subtitle": "Evolução política, social e humanitária."
-            },
-            {
-                "slug": "medio-oriente",
-                "label": "Médio Oriente",
-                "subtitle": "Crise no médio oriente, conflitos e diplomacia."
-            },
-            {
-                "slug": "operacao-furia-epica",
-                "label": "Operação Fúria Épica",
-                "subtitle": "A operação militar e seus desdobramentos."
+                "slug": "noticiario-antena1",
+                "label": "noticiario-antena1",
+                "subtitle": "noticiario-antena1"
             }
         ]
     },
@@ -98,6 +73,11 @@
                 "slug": "tecnologia",
                 "label": "Tecnologia",
                 "subtitle": "Inovação, ciência e impacto digital."
+            },
+            {
+                "slug": "investigacao",
+                "label": "Investigação",
+                "subtitle": "Acompanhe as investigações e reportagens especiais."
             }
         ]
     },

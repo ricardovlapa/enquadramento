@@ -1,0 +1,12 @@
+parameters:
+    level: 3
+    parallel:
+        maximumNumberOfProcesses: 1
+    paths:
+        - app/Model
+        - app/Service
+        - app/Router.php
+        - tests
+    bootstrapFiles:
+        - vendor/autoload.php
+    tmpDir: .phpstan
