@@ -14,7 +14,7 @@
         <?php else: ?>
           <?php foreach ($articles as $article): ?>
             <?php $articleAuthor = $article['author'] ?? null; ?>
-            <article class="card post-card opinion-card">
+            <article class="card post-card opinion-card<?= !empty($article['slug']) ? ' news-card-clickable' : '' ?>">
               <div class="post-card__body">
                 <p class="post-meta">
                   <?php if (is_array($articleAuthor) && !empty($articleAuthor['name'])): ?>
@@ -33,10 +33,8 @@
                 <?php if (!empty($article['intro'])): ?>
                   <p class="opinion-intro"><?= markdown($article['intro'] ?? '') ?></p>
                 <?php endif; ?>
-                <?php if (!empty($article['slug'])): ?>
-                  <a class="button" href="/opiniao-enquadramento/<?= e($article['slug'] ?? '') ?>">Ler artigo</a>
-                <?php endif; ?>
               </div>
+              <?= opinion_card_actions($article) ?>
             </article>
           <?php endforeach; ?>
         <?php endif; ?>
