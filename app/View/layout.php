@@ -322,6 +322,52 @@
   </script>
   <script>
     (function () {
+      const closeCardMenus = (except) => {
+        document.querySelectorAll('.news-card-actions.is-open').forEach((menu) => {
+          if (except && menu === except) {
+            return;
+          }
+          menu.classList.remove('is-open');
+          const toggle = menu.querySelector('[data-card-menu-toggle]');
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      };
+
+      document.addEventListener('click', (event) => {
+        const toggle = event.target.closest('[data-card-menu-toggle]');
+        if (toggle) {
+          event.preventDefault();
+          const actions = toggle.closest('.news-card-actions');
+          if (!actions) {
+            return;
+          }
+          const isOpen = actions.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          closeCardMenus(actions);
+          return;
+        }
+
+        if (event.target.closest('.news-card-actions__item')) {
+          closeCardMenus();
+          return;
+        }
+
+        if (!event.target.closest('.news-card-actions')) {
+          closeCardMenus();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeCardMenus();
+        }
+      });
+    })();
+  </script>
+  <script>
+    (function () {
       const modal = document.querySelector('[data-share-modal]');
       if (!modal) {
         return;
@@ -372,7 +418,13 @@
         }
         event.preventDefault();
         const id = trigger.getAttribute('data-share-id');
-        if (!id) {
+        const shareUrl = trigger.getAttribute('data-share-url');
+        const shareTitle = trigger.getAttribute('data-share-title') || document.title;
+        let endpoint = shareUrl || '';
+        if (!endpoint && id) {
+          endpoint = '/share/' + encodeURIComponent(id);
+        }
+        if (!endpoint) {
           window.location.href = trigger.getAttribute('href');
           return;
         }
@@ -380,10 +432,10 @@
         lastFocused = trigger;
         status.textContent = '';
         input.value = 'A gerar link...';
-        setShareLinks('#', document.title);
+        setShareLinks('#', shareTitle);
         openModal();
 
-        fetch('/share/' + encodeURIComponent(id) + '?json=1', {
+        fetch(endpoint + (endpoint.indexOf('?') >= 0 ? '&' : '?') + 'json=1', {
           headers: { 'X-Requested-With': 'XMLHttpRequest' },
         })
           .then((response) => response.ok ? response.json() : null)
@@ -394,7 +446,7 @@
               return;
             }
             input.value = data.share_url;
-            setShareLinks(data.share_url, document.title);
+            setShareLinks(data.share_url, shareTitle);
           })
           .catch(() => {
             input.value = '';

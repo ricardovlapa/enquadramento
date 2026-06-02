@@ -1,11 +1,14 @@
 <?php
 require dirname(__DIR__) . '/vendor/autoload.php';
 require dirname(__DIR__) . '/app/dotenv.php';
+require dirname(__DIR__) . '/app/basic_auth.php';
 
 load_env([
     dirname(__DIR__) . '/.env',
     dirname(__DIR__) . '/.env.local',
 ]);
+
+enforce_basic_auth_from_env();
 
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: SAMEORIGIN');

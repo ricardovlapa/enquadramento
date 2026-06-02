@@ -60,6 +60,67 @@ return function (Router $router, array $site, NewsRepository $news, OpinionRepos
     });
 
     if ($redirects !== null) {
+        $router->get('/share/opiniao/{slug}', function (array $params) use ($site, $opinions, $redirects) {
+            $slug = trim((string) ($params['slug'] ?? ''));
+            $article = $opinions->findArticleBySlug($slug);
+            if ($article === null) {
+                http_response_code(404);
+                if (isset($_GET['json']) && $_GET['json'] === '1') {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['error' => 'Not found']);
+                    return;
+                }
+                (new NotFoundController($site))->show();
+                return;
+            }
+
+            $configuredBase = rtrim((string) ($site['baseUrl'] ?? ''), '/');
+            if ($configuredBase !== '') {
+                $base = $configuredBase;
+            } else {
+                $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? '') === '443' ? 'https' : 'http';
+                $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+                $base = $scheme . '://' . $host;
+            }
+
+            $articlePath = '/opiniao-enquadramento/' . rawurlencode($slug);
+            $sourceUrl = $base . $articlePath;
+            $articleId = null;
+            if (isset($article['id']) && is_numeric((string) $article['id'])) {
+                $articleId = (int) $article['id'];
+            }
+            $title = $article['title'] ?? '';
+
+            $row = $redirects->findOrCreate($articleId, $sourceUrl, $title, '');
+            $token = $row['token'] ?? null;
+            if ($token === null) {
+                http_response_code(500);
+                if (isset($_GET['json']) && $_GET['json'] === '1') {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['error' => 'Failed to create share link.']);
+                    return;
+                }
+                echo 'Failed to create share link.';
+                return;
+            }
+
+            $shareUrl = $base . '/s/' . $token;
+            $redirectUrl = $base . '/r/' . $token;
+
+            if (isset($_GET['json']) && $_GET['json'] === '1') {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'share_url' => $shareUrl,
+                    'redirect_url' => $redirectUrl,
+                    'token' => $token,
+                ]);
+                return;
+            }
+
+            header('Location: ' . $shareUrl, true, 302);
+            exit;
+        });
+
         $router->get('/share/{id}', function (array $params) use ($site, $news, $redirects) {
             $id = $params['id'] ?? '';
             $item = $news->findById((string) $id);

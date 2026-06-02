@@ -3,7 +3,7 @@
 ?>
 <?php foreach ($items as $item): ?>
   <?php $hideImage = ($item['category_slug'] ?? '') === 'opiniao-outras-fontes'; ?>
-  <article class="card post-card">
+  <article class="card post-card<?= !empty($item['link']) ? ' news-card-clickable' : '' ?>">
     <?php if (!$hideImage): ?>
       <div class="post-image post-image--thumb">
         <img src="<?= image_src(!empty($item['image_url']) ? $item['image_url'] : '/assets/images/default_image_enquadramento.png') ?>" alt="<?= e($item['title'] ?? 'Imagem da notícia') ?>">
@@ -18,15 +18,7 @@
           <span> · <?= e($item['source_name'] ?? '') ?></span>
         <?php endif; ?>
       </p>
-      <h3>
-        <?php if (!empty($item['link'])): ?>
-          <a href="<?= e($item['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">
-            <?= e($item['title'] ?? 'Untitled') ?>
-          </a>
-        <?php else: ?>
-          <?= e($item['title'] ?? 'Untitled') ?>
-        <?php endif; ?>
-      </h3>
+      <h3><?= e($item['title'] ?? 'Untitled') ?></h3>
       <?php if (!empty($item['summary'])): ?>
         <p><?= e($item['summary'] ?? '') ?></p>
       <?php endif; ?>
@@ -35,12 +27,7 @@
           <a class="tag" href="/noticias/categoria/<?= e($item['category_slug'] ?? '') ?>">#<?= e($item['category_label'] ?? '') ?></a>
         </p>
       <?php endif; ?>
-      <?php if (!empty($item['link'])): ?>
-        <a class="button" href="<?= e($item['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">Ler fonte</a>
-        <?php if (!empty($item['id'])): ?>
-          <a class="button js-share-trigger" href="/share/<?= e($item['id']) ?>" data-share-id="<?= e($item['id']) ?>">Partilhar</a>
-        <?php endif; ?>
-      <?php endif; ?>
     </div>
+    <?= news_card_actions($item) ?>
   </article>
 <?php endforeach; ?>
