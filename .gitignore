@@ -6,3 +6,4 @@ vendor/
 .phpunit.cache/
 public/assets/.DS_Store
 public/.DS_Store
+sensitive-data/

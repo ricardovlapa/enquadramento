@@ -19,7 +19,7 @@ $featuredSide = array_slice($featured, 1, 2);
         <div class="card"><p><?= e($home['emptyNews'] ?? '') ?></p></div>
       <?php else: ?>
         <div class="featured-grid">
-          <article class="featured-card featured-card--lead">
+          <article class="featured-card featured-card--lead<?= !empty($featuredLead['link']) ? ' news-card-clickable' : '' ?>">
             <?php if (!empty($featuredLead['image_url'])): ?>
               <img src="<?= image_src($featuredLead['image_url']) ?>" alt="<?= e($featuredLead['title'] ?? 'Imagem da notícia') ?>">
             <?php else: ?>
@@ -38,14 +38,12 @@ $featuredSide = array_slice($featured, 1, 2);
               <?php if (!empty($featuredLead['summary'])): ?>
                 <p><?= e($featuredLead['summary'] ?? '') ?></p>
               <?php endif; ?>
-              <?php if (!empty($featuredLead['link'])): ?>
-                <a class="button button--light" href="<?= e($featuredLead['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">Ler fonte</a>
-              <?php endif; ?>
             </div>
+            <?= news_card_actions($featuredLead, 'news-card-actions--light') ?>
           </article>
           <div class="featured-side">
             <?php foreach ($featuredSide as $item): ?>
-              <article class="featured-card featured-card--side">
+              <article class="featured-card featured-card--side<?= !empty($item['link']) ? ' news-card-clickable' : '' ?>">
                 <?php if (!empty($item['image_url'])): ?>
                   <img src="<?= image_src($item['image_url']) ?>" alt="<?= e($item['title'] ?? 'Imagem da notícia') ?>">
                 <?php else: ?>
@@ -58,10 +56,8 @@ $featuredSide = array_slice($featured, 1, 2);
                     <?php endif; ?>
                   </p>
                   <h3><?= e($item['title'] ?? 'Untitled') ?></h3>
-                  <?php if (!empty($item['link'])): ?>
-                    <a class="button button--light" href="<?= e($item['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">Ler fonte</a>
-                  <?php endif; ?>
                 </div>
+                <?= news_card_actions($item, 'news-card-actions--light') ?>
               </article>
             <?php endforeach; ?>
           </div>
@@ -85,7 +81,7 @@ $featuredSide = array_slice($featured, 1, 2);
         <div class="layout latest-layout">
           <div class="latest-grid">
             <?php foreach ($latest as $item): ?>
-            <article class="card post-card">
+            <article class="card post-card<?= !empty($item['link']) ? ' news-card-clickable' : '' ?>">
               <?php if (!empty($item['image_url'])): ?>
                 <div class="post-image post-image--thumb">
                   <img src="<?= image_src($item['image_url']) ?>" alt="<?= e($item['title'] ?? 'Imagem da notícia') ?>">
@@ -108,10 +104,8 @@ $featuredSide = array_slice($featured, 1, 2);
                   <?php if (!empty($item['summary'])): ?>
                     <p><?= e($item['summary'] ?? '') ?></p>
                   <?php endif; ?>
-                  <?php if (!empty($item['link'])): ?>
-                    <a class="button" href="<?= e($item['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">Ler fonte</a>
-                  <?php endif; ?>
                 </div>
+                <?= news_card_actions($item) ?>
               </article>
             <?php endforeach; ?>
           </div>
@@ -176,7 +170,7 @@ $featuredSide = array_slice($featured, 1, 2);
           <div class="category-grid">
             <div class="category-feature-grid">
               <?php foreach ($featureItems as $feature): ?>
-                <article class="category-feature-card">
+                <article class="category-feature-card<?= !empty($feature['link']) ? ' news-card-clickable' : '' ?>">
                   <?php if (!empty($feature['image_url'])): ?>
                     <div class="category-feature-card__media">
                       <img src="<?= image_src($feature['image_url']) ?>" alt="<?= e($feature['title'] ?? 'Imagem da notícia') ?>">
@@ -199,16 +193,14 @@ $featuredSide = array_slice($featured, 1, 2);
                     <?php if (!empty($feature['summary'])): ?>
                       <p><?= e($feature['summary'] ?? '') ?></p>
                     <?php endif; ?>
-                    <?php if (!empty($feature['link'])): ?>
-                      <a class="button button--line" href="<?= e($feature['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">Ler fonte</a>
-                    <?php endif; ?>
                   </div>
+                  <?= news_card_actions($feature) ?>
                 </article>
               <?php endforeach; ?>
             </div>
             <div class="category-list">
               <?php foreach ($sectionList as $item): ?>
-                <article class="compact-card">
+                <article class="compact-card<?= !empty($item['link']) ? ' news-card-clickable' : '' ?>">
                   <?php if (!empty($item['image_url'])): ?>
                     <div class="compact-card__media">
                       <img src="<?= image_src($item['image_url']) ?>" alt="<?= e($item['title'] ?? 'Imagem da notícia') ?>">
@@ -225,10 +217,8 @@ $featuredSide = array_slice($featured, 1, 2);
                       <?php endif; ?>
                     </p>
                     <h4><?= e($item['title'] ?? 'Untitled') ?></h4>
-                    <?php if (!empty($item['link'])): ?>
-                      <a class="button button--ghost" href="<?= e($item['link'] ?? '') ?>" target="_blank" rel="noopener noreferrer">Ler fonte</a>
-                    <?php endif; ?>
                   </div>
+                  <?= news_card_actions($item, 'news-card-actions--light news-card-actions--compact') ?>
                 </article>
               <?php endforeach; ?>
             </div>

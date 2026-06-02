@@ -1,6 +1,7 @@
 {
   "name": "enquadramento/site",
   "description": "PHP news aggregation and editorial site",
+  "license": "GPL-3.0-only",
   "type": "project",
   "scripts": {
     "serve": "php -S localhost:8000 -t public",

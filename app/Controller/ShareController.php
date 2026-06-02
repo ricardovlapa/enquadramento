@@ -29,7 +29,8 @@ class ShareController extends BaseController
         }
 
         $title = (string) ($row['title'] ?? ($this->site['title'] ?? ''));
-        $desc = (string) ($row['summary'] ?? $row['description'] ?? 'Clique para ler a notícia original');
+        $isOpinion = str_contains((string) ($row['source_url'] ?? ''), '/opiniao-enquadramento/');
+        $desc = (string) ($row['summary'] ?? $row['description'] ?? ($isOpinion ? 'Clique para ler o artigo completo' : 'Clique para ler a notícia original'));
         $imagePath = (string) ($row['image'] ?? ($this->site['socialImage'] ?? ''));
 
         $base = $this->resolveBaseUrl();
@@ -54,6 +55,10 @@ class ShareController extends BaseController
             'title' => $title,
             'desc' => $desc,
             'redirectUrl' => $redirectUrl,
+            'ctaLabel' => $isOpinion ? 'Ler artigo' : 'Ler notícia',
+            'note' => $isOpinion
+                ? 'A pré-visualização não redireciona automaticamente. Clique no botão para abrir o artigo.'
+                : 'A pré-visualização não redireciona automaticamente. Clique no botão para abrir a fonte original.',
         ], $title, $meta);
     }
 
