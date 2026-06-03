@@ -1,0 +1,104 @@
+name: Deploy Staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate deployment branch
+        run: |
+          case "$GITHUB_REF" in
+            refs/heads/develop|refs/heads/release/*)
+              ;;
+            *)
+              echo "Invalid staging deployment branch: $GITHUB_REF"
+              echo "Allowed: develop or release/*."
+              exit 1
+              ;;
+          esac
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: ${{ runner.os }}-php-8.4-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.4-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run test suite
+        run: composer test
+
+      - name: Run static analysis
+        run: composer stan
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
+
+      - name: Prepare release files
+        run: |
+          mkdir -p "$RUNNER_TEMP/release"
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='.env.local' \
+            --exclude='.DS_Store' \
+            --exclude='.phpstan/' \
+            --exclude='.phpunit.cache/' \
+            --exclude='docs/' \
+            --exclude='sensitive-data/' \
+            --exclude='tests/' \
+            --exclude='under-construction/' \
+            ./ "$RUNNER_TEMP/release/"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: enquadramento-staging-${{ github.sha }}
+          path: ${{ runner.temp }}/release
+          retention-days: 14
+
+      - name: Install deployment tool
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Upload release by FTPS
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.FTP_REMOTE_DIR }}
+        run: |
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate true
+          mirror --reverse --delete --verbose \
+            --exclude-glob .env \
+            --exclude-glob .env.local \
+            "$RUNNER_TEMP/release" "$FTP_REMOTE_DIR"
+          bye
+          EOF
