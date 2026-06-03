@@ -2,9 +2,18 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main", "develop", "release/**" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main", "develop", "release/**" ]
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: Deployment environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
 
 permissions:
   contents: read
@@ -43,3 +52,83 @@ jobs:
 
       - name: Run static analysis
         run: composer stan
+
+  deploy:
+    name: Deploy ${{ inputs.target_environment }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    environment: ${{ inputs.target_environment }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate deployment branch
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.target_environment }}
+        run: |
+          case "$TARGET_ENVIRONMENT:$GITHUB_REF" in
+            staging:refs/heads/develop|staging:refs/heads/release/*|production:refs/heads/main)
+              ;;
+            *)
+              echo "Invalid deployment target: $TARGET_ENVIRONMENT from $GITHUB_REF"
+              echo "Allowed: staging from develop or release/*; production from main."
+              exit 1
+              ;;
+          esac
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
+
+      - name: Prepare release files
+        run: |
+          mkdir -p "$RUNNER_TEMP/release"
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='.env.local' \
+            --exclude='.DS_Store' \
+            --exclude='.phpstan/' \
+            --exclude='.phpunit.cache/' \
+            --exclude='docs/' \
+            --exclude='sensitive-data/' \
+            --exclude='tests/' \
+            --exclude='under-construction/' \
+            ./ "$RUNNER_TEMP/release/"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: enquadramento-${{ inputs.target_environment }}-${{ github.sha }}
+          path: ${{ runner.temp }}/release
+          retention-days: 14
+
+      - name: Install deployment tool
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Upload release by FTPS
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.FTP_REMOTE_DIR }}
+        run: |
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate true
+          mirror --reverse --delete --verbose \
+            --exclude-glob .env \
+            --exclude-glob .env.local \
+            "$RUNNER_TEMP/release" "$FTP_REMOTE_DIR"
+          bye
+          EOF
