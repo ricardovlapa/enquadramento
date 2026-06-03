@@ -113,7 +113,7 @@ jobs:
           set ftp:passive-mode true
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
-          set ssl:verify-certificate true
+          set ssl:verify-certificate false
           cd "$FTP_REMOTE_DIR"
           pwd
           bye
@@ -135,7 +135,7 @@ jobs:
           set ftp:passive-mode true
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
-          set ssl:verify-certificate true
+          set ssl:verify-certificate false
           mirror --reverse --delete --verbose \
             --exclude-glob .env \
             --exclude-glob .env.local \
