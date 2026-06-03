@@ -4,11 +4,7 @@ on:
   push:
     branches: [ "develop" ]
   pull_request:
-<<<<<<< Updated upstream
-    branches: [ "develop" ]
-=======
     branches: [ "main", "develop", "release/**" ]
->>>>>>> Stashed changes
 
 permissions:
   contents: read
