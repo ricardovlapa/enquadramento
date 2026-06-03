@@ -85,7 +85,20 @@ jobs:
       - name: Install deployment tool
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Upload release by FTPS
+      - name: Check FTP secrets
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.FTP_REMOTE_DIR }}
+        run: |
+          test -n "$FTP_HOST"
+          test -n "$FTP_USERNAME"
+          test -n "$FTP_PASSWORD"
+          test -n "$FTP_REMOTE_DIR"
+
+      - name: Test FTPS connection
+        timeout-minutes: 2
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -93,6 +106,33 @@ jobs:
           FTP_REMOTE_DIR: ${{ secrets.FTP_REMOTE_DIR }}
         run: |
           lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set cmd:fail-exit true
+          set net:timeout 20
+          set net:max-retries 2
+          set net:reconnect-interval-base 5
+          set ftp:passive-mode true
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate true
+          cd "$FTP_REMOTE_DIR"
+          pwd
+          bye
+          EOF
+
+      - name: Upload release by FTPS
+        timeout-minutes: 15
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.FTP_REMOTE_DIR }}
+        run: |
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set cmd:fail-exit true
+          set net:timeout 20
+          set net:max-retries 2
+          set net:reconnect-interval-base 5
+          set ftp:passive-mode true
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
           set ssl:verify-certificate true
